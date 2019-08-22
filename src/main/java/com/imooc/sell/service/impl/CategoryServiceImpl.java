@@ -1,6 +1,8 @@
 package com.imooc.sell.service.impl;
 
 import com.imooc.sell.dataobject.ProductCategory;
+import com.imooc.sell.enums.ResultEnum;
+import com.imooc.sell.exception.SellException;
 import com.imooc.sell.repository.ProductCategoryRepository;
 import com.imooc.sell.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public ProductCategory findOne(Integer categoryId) {
-        return repository.findById(categoryId).get();
+        return repository.findById(categoryId).orElseThrow(() -> new SellException(ResultEnum.PRODUCT_CATEGORY_NOT_EXIST));
+    }
+
+    @Override
+    public ProductCategory findOneOrNull(Integer categoryId) {
+        return repository.findById(categoryId).orElse(null);
     }
 
     @Override

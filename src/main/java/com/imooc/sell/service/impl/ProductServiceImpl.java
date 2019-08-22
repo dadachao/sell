@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
 /**
  * @author Kelvin
  */
@@ -25,7 +26,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductInfo findOne(String productId) {
-        return repository.findById(productId).get();
+       return repository.findById(productId).orElseThrow(()->new SellException(ResultEnum.PRODUCT_NOT_EXIST));
+    }
+
+    @Override
+    public ProductInfo findOneOrNull(String productId) {
+        return repository.findById(productId).orElse(null);
     }
 
     @Override
@@ -39,12 +45,20 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ProductInfo save(ProductInfo productInfo) {
         return repository.save(productInfo);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void increaseStock(List<CartDTO> cartDTOList) {
+        for (CartDTO cartDTO : cartDTOList){
+            ProductInfo productInfo = findOne(cartDTO.getProductId());
+            Integer result = productInfo.getProductStock() + cartDTO.getProductQuantity();
+            productInfo.setProductStock(result);
+            repository.save(productInfo);
+        }
 
     }
 
@@ -53,10 +67,6 @@ public class ProductServiceImpl implements ProductService {
     public void decreaseStock(List<CartDTO> cartDTOList) {
         for(CartDTO cartDTO : cartDTOList){
             ProductInfo productInfo = findOne(cartDTO.getProductId());
-            if(productInfo == null){
-                throw new SellException(ResultEnum.PRODUCT_NOT_EXIST);
-            }
-
             Integer result = productInfo.getProductStock() - cartDTO.getProductQuantity();
             if(result < 0 ){
                 throw new SellException(ResultEnum.PRODUCT_STOCK_ERROR);

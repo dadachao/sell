@@ -13,7 +13,19 @@ import java.util.List;
  */
 public interface ProductService {
 
+    /**
+     * 若查询到则返回对象，否则报[商品不存在 PRODUCT_NOT_EXIST]异常
+     * @param productId
+     * @return
+     */
     ProductInfo findOne(String productId);
+
+    /**
+     * 若查询到则返回对象，否则返回null
+     * @param productId
+     * @return
+     */
+    ProductInfo findOneOrNull(String productId);
 
     /**
      * 查询所有上架商品列表
@@ -26,7 +38,7 @@ public interface ProductService {
 
     ProductInfo save(ProductInfo productInfo);
 
-    //加库存
+    /** 加库存.*/
     void increaseStock(List<CartDTO> cartDTOList);
 
     //减库存
