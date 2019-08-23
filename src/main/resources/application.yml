@@ -6,3 +6,6 @@
 #    url: jdbc:mysql://192.168.43.180/sell?characterEncoding=utf-8&userSSL=false
 #  jpa:
 #    show-sql: true
+spring:
+  jackson:
+    default-property-inclusion: non_null

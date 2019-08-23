@@ -55,11 +55,8 @@ public class OrderServiceImpl implements OrderService {
         //1. 查询商品(数量,价格)
         List<OrderDetail> orderDetailList = orderDTO.getOrderDetailList();
         for(OrderDetail orderDetail : orderDetailList){
+            //方法体内已异常判断
             ProductInfo productInfo = productService.findOne(orderDetail.getProductId());
-//            if(productInfo == null){
-//                throw new SellException(ResultEnum.PRODUCT_NOT_EXIST);
-//            }
-
             //2. 计算总价(注意乘法的使用)
             orderAmount = productInfo.getProductPrice().multiply(new BigDecimal
                     (orderDetail.getProductQuantity())).add(orderAmount);
@@ -91,7 +88,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDTO findOne(String orderId) {
-        OrderMaster orderMaster = orderMasterRepository.findById(orderId).get();
+        OrderMaster orderMaster = orderMasterRepository.findById(orderId).orElse(null);
         if(orderMaster == null){
             throw new SellException(ResultEnum.ORDER_NOT_EXIST);
         }
@@ -104,6 +101,7 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setOrderDetailList(orderDetailList);
         return orderDTO;
     }
+
 
     @Override
     public Page<OrderDTO> findList(String buyerOpenid, Pageable pageable) {
@@ -171,7 +169,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public OrderDTO paid(OrderDTO orderDTO) {
         //判断订单状态
         if(!orderDTO.getOrderStatus().equals(OrderStatusEnum.NEW.getCode())){

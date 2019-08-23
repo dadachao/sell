@@ -22,10 +22,24 @@ public interface CategoryService {
      */
     ProductCategory findOneOrNull(Integer categoryId);
 
+    /***
+     * 查询所有种类
+     * @return
+     */
     List<ProductCategory> findAll();
 
+    /**
+     * 查询指定范围内的种类
+     * @param list
+     * @return
+     */
     List<ProductCategory> findByCategoryTypeIn(List<Integer> list);
 
+    /**
+     * 保存
+     * @param productCategory
+     * @return
+     */
     ProductCategory save(ProductCategory productCategory);
 
 }
